@@ -1,0 +1,1 @@
+scrapy crawl TweetScraper -a query="foo,#bar" -a lang="th"
