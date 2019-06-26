@@ -1,6 +1,7 @@
 import json
 import os
 import glob
+import pandas as pd 
 
 from argparse import ArgumentParser
 parser = ArgumentParser(description = 'JSON Compressor')
@@ -32,6 +33,42 @@ def extract(json_file, path):
             outfile.write(element["text"])
 
     return path
+
+def get_hashtag(string, sign = True):
+    """
+    Get hashtags from a string
+    """
+    hashtag_set = set(part[1:] for part in string.split() if part.startswith('#'))
+    hashtag_list = list(hashtag_set)
+    if sign:
+        hashtag_list = ['#'+item for item in hashtag_list]
+    return hashtag_list
+
+def collect_hashtag(text_file, sign = True, flatten = True):
+    with open (text_file, "r") as file:
+        data = file.readlines()
+    data = [item.replace('\n', '') for item in data]
+    hashtag_list = []
+    for tweet in data:
+        hashtag = get_hashtag(tweet, sign = sign)
+        if flatten:
+            hashtag_list.extend(hashtag)
+        else:
+            hashtag_list.append(hashtag)
+    return hashtag_list
+
+def count_hashtag(hashtag_list):
+    element_set = set(hashtag_list)
+    element_list = list(element_set)
+    count = []
+    for element in element_list:
+        occ = hashtag_list.count(element)
+        count.append(occ)
+    df_count = pd.DataFrame({'Hashtags':element_list, 'Occurences':count})
+    df_count = df_count.sort_values(by = ['Occurences'], ascending = False)
+    df_count = df_count.reset_index(drop = True)
+    print(df_count.head(10))
+    return df_count
 
 if __name__ == "__main__":
     args = parser.parse_args()
