@@ -30,7 +30,7 @@ def extract(json_file, path):
 
     with open(path, "w", encoding="utf-8") as outfile:
         for element in list_dict:
-            outfile.write(element["text"])
+            outfile.write(element["text"]+"\n---------------\n")
 
     return path
 
