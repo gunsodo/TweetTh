@@ -19,7 +19,7 @@ def compress(file_dir, path):
             except ValueError:
                 print(f)
 
-    with open(path, "w") as outfile:
+    with open(path, "w", encoding="utf-8") as outfile:
         json.dump(result, outfile)
 
     return path
@@ -28,7 +28,7 @@ def extract(json_file, path):
     with open(json_file, 'r') as f:
         list_dict = json.load(f)
 
-    with open(path, "w") as outfile:
+    with open(path, "w", encoding="utf-8") as outfile:
         for element in list_dict:
             outfile.write(element["text"])
 
