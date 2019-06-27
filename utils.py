@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 parser = ArgumentParser(description = 'JSON Compressor')
 parser.add_argument('--file_dir', required = True, help = 'JSON Directory')
 parser.add_argument('--path', required = True, help = 'Path to save the compressed file')
-parser.add_argument('--format', help = 'Either .txt (default) or .csv (more details)')
+parser.add_argument('--format', default = 0, type = int, help = 'Either .txt (default = 0) or .csv (more details = 1)')
 
 def compress(file_dir, path):
     result = []
@@ -90,9 +90,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
     file_dir = args.file_dir
     path = args.path
-    file_format = args.format
 
     json_file = compress(file_dir, os.path.join(os.getcwd(), 'compressed.json'))
-    extract_txt(json_file, path)
+    if args.format == 0:
+        extract_txt(json_file, path)
+    elif args.format == 1:
+        extract_csv(json_file, path)
+    else:
+        raise ValueError("Must return value only 0 or 1.")
     os.remove(json_file)
         
