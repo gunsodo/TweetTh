@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 parser = ArgumentParser(description = 'JSON Compressor')
 parser.add_argument('--file_dir', required = True, help = 'JSON Directory')
 parser.add_argument('--path', required = True, help = 'Path to save the compressed file')
+parser.add_argument('--format', help = 'Either .txt (default) or .csv (more details)')
 
 def compress(file_dir, path):
     result = []
@@ -74,6 +75,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     file_dir = args.file_dir
     path = args.path
+    file_format = args.format
 
     json_file = compress(file_dir, os.path.join(os.getcwd(), 'compressed.json'))
     extract(json_file, path)
