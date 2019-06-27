@@ -1,7 +1,8 @@
 import json
 import os
 import glob
-import pandas as pd 
+import pandas as pd
+import csv 
 
 from argparse import ArgumentParser
 parser = ArgumentParser(description = 'JSON Compressor')
@@ -24,7 +25,7 @@ def compress(file_dir, path):
 
     return path
 
-def extract(json_file, path):
+def extract_txt(json_file, path):
     with open(json_file, 'r') as f:
         list_dict = json.load(f)
 
@@ -32,6 +33,20 @@ def extract(json_file, path):
         for element in list_dict:
             outfile.write(element["text"]+"\n---------------\n")
 
+    return path
+
+def extract_csv(json_file, path):
+    with open(json_file, 'r') as f:
+        list_dict = json.load(f)
+
+    with open(path, "w", encoding="utf-8") as outfile:
+        count = 0
+        csvwriter = csv.writer(outfile)
+        for element in list_dict:
+            if count == 0:
+                csvwriter.writerow(element.keys())
+            count += 1
+            csvwriter.writerow(element.values())
     return path
 
 def get_hashtag(string, sign = True):
@@ -76,6 +91,6 @@ if __name__ == "__main__":
     path = args.path
 
     json_file = compress(file_dir, os.path.join(os.getcwd(), 'compressed.json'))
-    extract(json_file, path)
+    extract_txt(json_file, path)
     os.remove(json_file)
         
