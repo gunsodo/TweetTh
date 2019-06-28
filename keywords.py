@@ -4,6 +4,8 @@ import pandas as pd
 import nltk
 import sys
 import progressbar
+import numpy as np
+import collections
 
 from pythainlp.tokenize import word_tokenize
 from pythainlp.corpus.common import thai_stopwords
@@ -98,5 +100,10 @@ split_words_j = [','.join(tkn) for tkn in split_words]
 tvec = TfidfVectorizer(analyzer=lambda x:x.split(','),)
 t_feat = tvec.fit_transform(split_words_j)
 
-print(t_feat[:,:5].todense())
-print(len(tvec.idf_),len(tvec.vocabulary_))
+sorted_vocab = sorted(tvec.vocabulary_.items(), key = lambda kv: kv[1])
+sorted_dict = collections.OrderedDict(sorted_vocab)
+list_vocab = [k for k in sorted_dict]
+
+t_array = np.transpose(t_feat.toarray())
+t_df = pd.DataFrame(t_array, columns = range(len(cleaned_tweets)), index = list_vocab)
+print(t_df)
