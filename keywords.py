@@ -1,6 +1,3 @@
-from pythainlp.tokenize import word_tokenize
-import pandas as pd
-
 import re
 import string
 import pandas as pd
@@ -87,3 +84,11 @@ print(cvec.vocabulary_)
 
 # Count of the first 20 ids
 print(c_feat[:,:20].todense())
+
+tvec = TfidfVectorizer(analyzer=lambda x:x.split(','),)
+t_feat = tvec.fit_transform(split_words_j)
+
+# TFIDF of the first 5 ids
+print(t_feat[:,:5].todense())
+
+print(len(tvec.idf_),len(tvec.vocabulary_))
