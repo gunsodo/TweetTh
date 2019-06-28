@@ -87,11 +87,16 @@ bar.finish()
 
 print("Processing...")
 split_words_j = [','.join(tkn) for tkn in split_words]
-cvec = CountVectorizer(analyzer=lambda x:x.split(','))
-c_feat = cvec.fit_transform(split_words_j)
 
-print(cvec.vocabulary_)
+# normal count
+# cvec = CountVectorizer(analyzer=lambda x:x.split(','))
+# c_feat = cvec.fit_transform(split_words_j)
 
-# Count of the first 20 IDs
-print(c_feat[:,:20].todense())
+# print(cvec.vocabulary_)
+# print(c_feat[:,:20].todense())
 
+tvec = TfidfVectorizer(analyzer=lambda x:x.split(','),)
+t_feat = tvec.fit_transform(split_words_j)
+
+print(t_feat[:,:5].todense())
+print(len(tvec.idf_),len(tvec.vocabulary_))
