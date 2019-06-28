@@ -1,12 +1,12 @@
-from pythainlp.tokenize import word_tokenize
-import pandas as pd
-
 import re
 import string
 import pandas as pd
 import nltk
+import sys
+import progressbar
+
 from pythainlp.tokenize import word_tokenize
-from pythainlp.corpus import stopwords
+from pythainlp.corpus.common import thai_stopwords
 from pythainlp.corpus import wordnet
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import words
@@ -14,7 +14,9 @@ from stop_words import get_stop_words
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-df = pd.read_csv("extract_salim.csv",error_bad_lines=False, warn_bad_lines=False)
+if len(sys.argv) != 2:
+    print("Usage: {} CSV_FILE".format(sys.argv[0]))
+    sys.exit(1)
 
 def clean_msg(msg):
     # Remove all text within "<>"
@@ -30,18 +32,21 @@ def clean_msg(msg):
     # Remove separator e.g. \n \t
     msg = ' '.join(msg.split())
     
-    #Suggessting to remove links like httplinemetipuPmN0rkrnl, pictwittercomE6PgjFH2on
+    # Suggesting to remove links like httplinemetipuPmN0rkrnl, pictwittercomE6PgjFH2on, twittercom
     
     return msg
 
 def split_word(text):
-            
+    th_stop = tuple(thai_stopwords())
+    en_stop = tuple(get_stop_words('en'))
+    p_stemmer = PorterStemmer()
+
     tokens = word_tokenize(text,engine='newmm')
     
     # Remove Thai and English stop words
     tokens = [i for i in tokens if not i in th_stop and not i in en_stop]
 
-    # Find Thai and Emglish stem words
+    # Find Thai and English stem words
     # English
     tokens = [p_stemmer.stem(i) for i in tokens]
     
@@ -64,26 +69,29 @@ def split_word(text):
 
     return tokens
 
-print("Cleaning text...")
-
 nltk.download('words')
-th_stop = tuple(thai_stopwords.words('thai'))
-en_stop = tuple(get_stop_words('en'))
-p_stemmer = PorterStemmer()
 
+df = pd.read_csv(sys.argv[1], error_bad_lines=False, warn_bad_lines=False)
+
+print("Cleaning text...")
 cleaned_tweets = [clean_msg(tweets) for tweets in df['text']]
 
-split_words = []
-
 print("Splitting words...")
+bar = progressbar.ProgressBar(maxval = len(cleaned_tweets), widgets = ['Progress: ', progressbar.SimpleProgress(), ' ', progressbar.Bar('=', '[', ']'), ' ', progressbar.ETA(), ' ', progressbar.Percentage()])
+bar.start()
+split_words = []
+for index, txt in enumerate(cleaned_tweets):
+    split_words.append(split_word(txt))
+    bar.update(index+1)
+bar.finish()
 
-split_words = [split_word(txt) for txt in cleaned_tweets]
-
+print("Processing...")
 split_words_j = [','.join(tkn) for tkn in split_words]
 cvec = CountVectorizer(analyzer=lambda x:x.split(','))
 c_feat = cvec.fit_transform(split_words_j)
 
 print(cvec.vocabulary_)
 
-# Count of the first 20 ids
+# Count of the first 20 IDs
 print(c_feat[:,:20].todense())
+
