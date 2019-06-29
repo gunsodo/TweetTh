@@ -106,4 +106,9 @@ list_vocab = [k for k in sorted_dict]
 
 t_array = np.transpose(t_feat.toarray())
 t_df = pd.DataFrame(t_array, columns = range(len(cleaned_tweets)), index = list_vocab)
-print(t_df)
+
+sum_df = t_df.sum(axis = 1, skipna = True)
+sum_df = pd.DataFrame(sum_df, columns = ['Frequency'])
+sum_df = sum_df.sort_values(by = 'Frequency', ascending = False)
+print(sum_df.head(50))
+print(sum_df.sum())
