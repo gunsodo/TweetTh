@@ -27,10 +27,10 @@ def word_heatmap(df,titlename,is_log = True):
         
         
         # Plot a heatmap of the table
-        sns.heatmap(pd_crosstab, norm=log_norm,cbar_kws={"ticks": cbar_ticks})
+        sns.heatmap(pd_crosstab, norm=log_norm,cbar_kws={"ticks": cbar_ticks},cmap="YlOrRd")
 
     elif is_log == False:
-        sns.heatmap(pd_crosstab)
+        sns.heatmap(pd_crosstab,cmap="YlOrRd")
    
     # Rotate tick marks for visibility
     plt.yticks(rotation=0)
