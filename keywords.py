@@ -118,7 +118,7 @@ sum_df = sum_df.sort_values(by = 'Frequency', ascending = False)
 print(sum_df.head(50))
 print(sum_df.sum())
 
-#-----------------------------_#
+#-----------------------------#
 
 cvec = CountVectorizer(analyzer=lambda x:x.split(','))
 c_feat = cvec.fit_transform(split_words_j)
