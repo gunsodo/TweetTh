@@ -10,14 +10,21 @@ import collections
 from pythainlp.tokenize import word_tokenize
 from pythainlp.corpus.common import thai_stopwords
 from pythainlp.corpus import wordnet
+
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import words
+from nltk.collocations import BigramCollocationFinder 
+from nltk.collocations import TrigramCollocationFinder 
+from nltk.metrics import BigramAssocMeasures
+from nltk.metrics import TrigramAssocMeasures
+
 from stop_words import get_stop_words
+
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-if len(sys.argv) != 2:
-    print("Usage: {} CSV_FILE".format(sys.argv[0]))
+if len(sys.argv) != 3:
+    print("Usage: {} CSV_FILE N_WORDS".format(sys.argv[0]))
     sys.exit(1)
 
 def clean_msg(msg):
@@ -71,6 +78,9 @@ def split_word(text):
 
     return tokens
 
+def get_th_stop():
+    return tuple(thai_stopwords())
+
 nltk.download('words')
 
 df = pd.read_csv(sys.argv[1], error_bad_lines=False, warn_bad_lines=False)
@@ -90,13 +100,6 @@ bar.finish()
 print("Processing...")
 split_words_j = [','.join(tkn) for tkn in split_words]
 
-# normal count
-# cvec = CountVectorizer(analyzer=lambda x:x.split(','))
-# c_feat = cvec.fit_transform(split_words_j)
-
-# print(cvec.vocabulary_)
-# print(c_feat[:,:20].todense())
-
 tvec = TfidfVectorizer(analyzer=lambda x:x.split(','),)
 t_feat = tvec.fit_transform(split_words_j)
 
@@ -112,3 +115,37 @@ sum_df = pd.DataFrame(sum_df, columns = ['Frequency'])
 sum_df = sum_df.sort_values(by = 'Frequency', ascending = False)
 print(sum_df.head(50))
 print(sum_df.sum())
+
+#-----------------------------_#
+
+cvec = CountVectorizer(analyzer=lambda x:x.split(','))
+c_feat = cvec.fit_transform(split_words_j)
+# vocabs = [w for w in cvec.vocabulary_.keys()]
+
+flattened_split_words = [y for x in split_words for y in x]
+biagram_collocation = BigramCollocationFinder.from_words(flattened_split_words) 
+th_stop = get_th_stop()
+filter_stops = lambda w: len(w) < 3 or w in th_stop
+biagram_collocation.apply_word_filter(filter_stops)
+
+biagram = biagram_collocation.score_ngrams(BigramAssocMeasures.likelihood_ratio)
+
+prefix_keys = collections.defaultdict(list)
+for key, scores in biagram:
+   prefix_keys[key[0]].append((key[1], scores))
+
+for key in prefix_keys:
+   prefix_keys[key].sort(key = lambda x: -x[1])
+
+n_words = int(sys.argv[2])
+
+top_index = sum_df.index.values.tolist()
+count = 0
+i = 0
+while count < n_words:
+    if len(prefix_keys[top_index[i]][:10]) != 0:
+        print(top_index[i], prefix_keys[top_index[i]][:10], "\n")
+        count+=1
+    else:
+        pass
+    i+=1
