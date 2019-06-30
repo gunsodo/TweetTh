@@ -41,8 +41,10 @@ def clean_msg(msg):
     # Remove separator e.g. \n \t
     msg = ' '.join(msg.split())
     
-    # Suggesting to remove links like httplinemetipuPmN0rkrnl, pictwittercomE6PgjFH2on, twittercom
-    
+    # Remove links like httplinemetipuPmN0rkrnl, pictwittercomE6PgjFH2on, twittercom
+    msg = re.sub(r'http.*','', msg)
+    msg = re.sub(r'pictwitter.*','', msg)
+    msg = re.sub(r'twittercom.*','', msg)
     return msg
 
 def split_word(text):
