@@ -15,7 +15,7 @@ joblib==0.13.2
 lxml==4.3.4
 marisa-trie==0.7.5
 mysql-connector==2.2.9
-nltk==3.4.3
+nltk==3.4.5
 numpy==1.16.4
 pandas==0.24.2
 parsel==1.5.1
