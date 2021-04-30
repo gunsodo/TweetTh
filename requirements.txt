@@ -42,6 +42,6 @@ stop-words==2018.7.23
 tinydb==3.13.0
 tqdm==4.32.2
 Twisted==19.7.0
-urllib3==1.25.3
+urllib3==1.25.8
 w3lib==1.20.0
 zope.interface==4.6.0
